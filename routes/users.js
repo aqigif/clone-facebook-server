@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var sha256 = require('sha256');
 var models = require('../models');
 
 /* GET users listing. */
@@ -32,7 +33,7 @@ router.get('/:id', async function(req, res, next) {
 router.post('/', async function (req, res, next) {
   try {
     const {name,email,password,avatar} = req.body;
-    const users = await models.users.create({name,email,password,avatar});
+    const users = await models.users.create({name,email, password:sha256(password),avatar});
   if (users) {
     res.status(201).send('created');
   }
@@ -46,7 +47,7 @@ router.patch('/:id', async function (req, res, next) {
   try {
     const userId = req.params.id;
     const {name,email,password,avatar} = req.body;
-    const users = await models.users.update({name,email,password,avatar},{where: {id: userId}});
+    const users = await models.users.update({name,email,password:sha256(password),avatar},{where: {id: userId}});
     if (users) {
       res.status(201).send('updated')
     }
