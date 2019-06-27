@@ -5,7 +5,7 @@ var models = require('../models');
 /* GET posts listing. */
 router.get('/', async function(req, res, next) {
   try{
-    var posts = await models.posts.findAll({include: ['users']})
+    var posts = await models.posts.findAll({include: ['users'], order:[['createdAt','DESC']]})
     posts = posts.map(item => {
       delete item.users.dataValues.password
       return item.dataValues;
@@ -31,8 +31,9 @@ router.get('/:id', async function(req, res, next) {
 /* Post. */
 router.post('/', async function (req, res, next) {
   try {
-    const {feed,image,usersId} = req.body;
-    const posts = await models.posts.create({feed,image,usersId});
+    const feed = req.body.feed;
+    const usersId = req.user.id;
+    const posts = await models.posts.create({feed,usersId});
   if (posts) {
     res.status(201).send('created');
   }
